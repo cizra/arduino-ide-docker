@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -e
+
+# For better security, pass here the directory containing your sketches
+SKETCHBOOK_LOCATION=${1:-$HOME}
+
+docker build -t arduino-gui .
+mkdir -p $SKETCHBOOK_LOCATION/.arduino15
+
+docker run \
+  --rm \
+  -it \
+  --cap-drop=ALL \
+  --mount type=bind,src=$XAUTHORITY,dst=/home/arduino/.Xauthority \
+  --mount type=bind,src=$SKETCHBOOK_LOCATION/.arduino15,dst=/home/arduino/.arduino15 \
+  --mount type=bind,src=$SKETCHBOOK_LOCATION,dst=/home/arduino/Arduino \
+  --mount type=bind,src=/tmp/.X11-unix,dst=/tmp/.X11-unix \
+  -e DISPLAY=$DISPLAY \
+  arduino-gui
